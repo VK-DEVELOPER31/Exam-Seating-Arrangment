@@ -1,1 +1,1 @@
-# Exam-Seating-Arrangment
+# Exam-Seating-Arrangement
