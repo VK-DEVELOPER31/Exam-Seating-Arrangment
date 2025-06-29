@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Seating Arrangement Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .input-section {
+            padding: 40px;
+            background: #f8f9fa;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: block;
+            margin: 0 auto;
+            font-weight: 600;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .results-section {
+            padding: 40px;
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .seating-plan {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .plan-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        .room {
+            margin: 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .room-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .benches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .bench {
+            background: #f8f9fa;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        .bench:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .bench-number {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .students {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .student {
+            background: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #e1e5e9;
+            font-weight: 500;
+            flex: 1;
+            text-align: center;
+        }
+
+        .empty {
+            background: #f1f3f4;
+            color: #666;
+            font-style: italic;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .statistics {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .statistics h3 {
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .input-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .benches-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Exam Seating Arrangement Generator</h1>
+            <p>Automatically generate seating arrangements with anti-cheating measures</p>
+        </div>
+
+        <div class="input-section">
+            <div class="input-group">
+                <div class="form-group">
+                    <label for="numStudents">Number of Students:</label>
+                    <input type="number" id="numStudents" min="1" max="1000" placeholder="Enter number of students">
+                </div>
+                <div class="form-group">
+                    <label for="numClassrooms">Number of Classrooms:</label>
+                    <input type="number" id="numClassrooms" min="1" max="20" placeholder="Enter number of classrooms">
+                </div>
+                <div class="form-group">
+                    <label for="benchesPerRoom">Benches per Room:</label>
+                    <input type="number" id="benchesPerRoom" min="1" max="50" placeholder="Enter benches per room">
+                </div>
+            </div>
+            <button class="generate-btn" onclick="generateSeating()">🎯 Generate Seating Arrangement</button>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="seating-plan">
+                <div class="plan-header">
+                    📋 EXAM SEATING ARRANGEMENT
+                </div>
+                <div id="seatingPlan"></div>
+            </div>
+            
+            <div class="statistics">
+                <h3>📊 Statistics</h3>
+                <div class="stats-grid" id="statistics">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ExamSeatingArrangement {
+            constructor() {
+                this.students = [];
+                this.classrooms = 0;
+                this.benchesPerRoom = 0;
+                this.seatingPlan = {};
+                this.warnings = [];
+            }
+
+            setStudents(numStudents) {
+                this.students = Array.from({length: numStudents}, (_, i) => i + 1);
+            }
+
+            setClassroomConfig(classrooms, benchesPerRoom) {
+                this.classrooms = classrooms;
+                this.benchesPerRoom = benchesPerRoom;
+            }
+
+            generateSeatingPlan() {
+                if (!this.students.length || this.classrooms === 0 || this.benchesPerRoom === 0) {
+                    throw new Error("Please set students and classroom configuration first");
+                }
+
+                // Calculate total benches needed
+                const totalBenchesNeeded = Math.ceil(this.students.length / 2);
+                const totalBenchesAvailable = this.classrooms * this.benchesPerRoom;
+
+                if (totalBenchesNeeded > totalBenchesAvailable) {
+                    throw new Error(`Not enough benches. Need ${totalBenchesNeeded}, but only ${totalBenchesAvailable} available`);
+                }
+
+                // Create a copy of students list to shuffle
+                const studentsCopy = [...this.students];
+                this.shuffleArray(studentsCopy);
+
+                // Initialize seating plan
+                this.seatingPlan = {};
+                for (let room = 1; room <= this.classrooms; room++) {
+                    this.seatingPlan[`Room ${room}`] = [];
+                }
+
+                // Assign students to benches
+                let benchCount = 0;
+                let currentBench = [];
+
+                for (let i = 0; i < studentsCopy.length; i++) {
+                    const student = studentsCopy[i];
+                    currentBench.push(student);
+
+                    // When we have 2 students or it's the last student
+                    if (currentBench.length === 2 || i === studentsCopy.length - 1) {
+                        // Check if consecutive roll numbers are on the same bench
+                        if (currentBench.length === 2 && Math.abs(currentBench[0] - currentBench[1]) === 1) {
+                            this.warnings.push(`Warning: Consecutive roll numbers ${currentBench[0]} and ${currentBench[1]} are on the same bench`);
+                        }
+
+                        // Determine which room this bench goes to
+                        const roomNum = Math.floor(benchCount / this.benchesPerRoom) + 1;
+                        if (roomNum <= this.classrooms) {
+                            const roomKey = `Room ${roomNum}`;
+                            const benchNumber = (benchCount % this.benchesPerRoom) + 1;
+                            this.seatingPlan[roomKey].push({
+                                benchNumber: benchNumber,
+                                students: [...currentBench]
+                            });
+                        }
+
+                        currentBench = [];
+                        benchCount++;
+                    }
+                }
+
+                return this.seatingPlan;
+            }
+
+            shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            getStatistics() {
+                if (!this.seatingPlan || Object.keys(this.seatingPlan).length === 0) {
+                    return {};
+                }
+
+                let totalStudentsAssigned = 0;
+                let totalBenchesUsed = 0;
+
+                for (const room in this.seatingPlan) {
+                    totalBenchesUsed += this.seatingPlan[room].length;
+                    for (const bench of this.seatingPlan[room]) {
+                        totalStudentsAssigned += bench.students.length;
+                    }
+                }
+
+                return {
+                    totalStudents: this.students.length,
+                    studentsAssigned: totalStudentsAssigned,
+                    totalBenchesUsed: totalBenchesUsed,
+                    classroomsUsed: Object.keys(this.seatingPlan).length,
+                    benchesPerRoom: this.benchesPerRoom,
+                    warnings: this.warnings.length
+                };
+            }
+        }
+
+        function generateSeating() {
+            const numStudents = parseInt(document.getElementById('numStudents').value);
+            const numClassrooms = parseInt(document.getElementById('numClassrooms').value);
+            const benchesPerRoom = parseInt(document.getElementById('benchesPerRoom').value);
+
+            // Validation
+            if (!numStudents || !numClassrooms || !benchesPerRoom) {
+                showError('Please fill in all fields with valid numbers.');
+                return;
+            }
+
+            if (numStudents < 1 || numClassrooms < 1 || benchesPerRoom < 1) {
+                showError('All values must be greater than 0.');
+                return;
+            }
+
+            try {
+                const seating = new ExamSeatingArrangement();
+                seating.setStudents(numStudents);
+                seating.setClassroomConfig(numClassrooms, benchesPerRoom);
+                seating.generateSeatingPlan();
+
+                displaySeatingPlan(seating.seatingPlan);
+                displayStatistics(seating.getStatistics());
+                displayWarnings(seating.warnings);
+
+                document.getElementById('resultsSection').classList.add('show');
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        function displaySeatingPlan(seatingPlan) {
+            const container = document.getElementById('seatingPlan');
+            container.innerHTML = '';
+
+            for (const room in seatingPlan) {
+                const roomDiv = document.createElement('div');
+                roomDiv.className = 'room';
+
+                const roomHeader = document.createElement('div');
+                roomHeader.className = 'room-header';
+                roomHeader.textContent = room;
+                roomDiv.appendChild(roomHeader);
+
+                const benchesGrid = document.createElement('div');
+                benchesGrid.className = 'benches-grid';
+
+                seatingPlan[room].forEach(bench => {
+                    const benchDiv = document.createElement('div');
+                    benchDiv.className = 'bench';
+
+                    const benchNumber = document.createElement('div');
+                    benchNumber.className = 'bench-number';
+                    benchNumber.textContent = `Bench ${bench.benchNumber}`;
+                    benchDiv.appendChild(benchNumber);
+
+                    const studentsDiv = document.createElement('div');
+                    studentsDiv.className = 'students';
+
+                    // First student
+                    const student1 = document.createElement('div');
+                    student1.className = 'student';
+                    student1.textContent = bench.students[0];
+                    studentsDiv.appendChild(student1);
+
+                    // Second student or empty
+                    const student2 = document.createElement('div');
+                    student2.className = 'student';
+                    if (bench.students[1]) {
+                        student2.textContent = bench.students[1];
+                    } else {
+                        student2.textContent = 'Empty';
+                        student2.classList.add('empty');
+                    }
+                    studentsDiv.appendChild(student2);
+
+                    benchDiv.appendChild(studentsDiv);
+                    benchesGrid.appendChild(benchDiv);
+                });
+
+                roomDiv.appendChild(benchesGrid);
+                container.appendChild(roomDiv);
+            }
+        }
+
+        function displayStatistics(stats) {
+            const container = document.getElementById('statistics');
+            container.innerHTML = '';
+
+            const statItems = [
+                { label: 'Total Students', value: stats.totalStudents },
+                { label: 'Students Assigned', value: stats.studentsAssigned },
+                { label: 'Benches Used', value: stats.totalBenchesUsed },
+                { label: 'Classrooms Used', value: stats.classroomsUsed },
+                { label: 'Benches per Room', value: stats.benchesPerRoom },
+                { label: 'Warnings', value: stats.warnings }
+            ];
+
+            statItems.forEach(item => {
+                const statDiv = document.createElement('div');
+                statDiv.className = 'stat-item';
+
+                const valueDiv = document.createElement('div');
+                valueDiv.className = 'stat-value';
+                valueDiv.textContent = item.value;
+
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'stat-label';
+                labelDiv.textContent = item.label;
+
+                statDiv.appendChild(valueDiv);
+                statDiv.appendChild(labelDiv);
+                container.appendChild(statDiv);
+            });
+        }
+
+        function displayWarnings(warnings) {
+            const container = document.getElementById('seatingPlan');
+            
+            warnings.forEach(warning => {
+                const warningDiv = document.createElement('div');
+                warningDiv.className = 'warning';
+                warningDiv.textContent = warning;
+                container.appendChild(warningDiv);
+            });
+        }
+
+        function showError(message) {
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.innerHTML = `
+                <div class="error">
+                    <strong>Error:</strong> ${message}
+                </div>
+            `;
+            resultsSection.classList.add('show');
+        }
+
+        // Add enter key support for inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        generateSeating();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
